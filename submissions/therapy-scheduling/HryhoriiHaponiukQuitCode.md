@@ -43,6 +43,7 @@
 - Збої: немає ключа, 429 (і HTTP 200 з code 429), 529, таймаут 20 с, не за схемою → «The assistant is unavailable right now. Fill in the form manually.» (AC-INTAKE-08), форма лишається ручною; `maxRetries: 0`
 - Промпт з даними в межах: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/src/lib/ai/prompts/intake.ts — теги `<client_request>`, теги з тексту вирізано, ≤ 2000 символів, `INTAKE_PROMPT_VERSION` = `intake-v2`
 - PR задач «Реалізація»: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/pull/61, https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/pull/62 — злиті. CodeRabbit на обидва не зробив рев'ю («Review limit reached»), знахідок немає; злито без рев'ю через строк здачі — сказано в коментарях PR
+- Після здачі — виправлення за рев'ю коду (`/code-review`, 10 знахідок): https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/pull/63, злито 16.11 (`10cea84`). Відмова, якщо модель не повернула жодного поля (AC-INTAKE-06); денний ліміт 50 чернеток на працівника, міграція `intake_draft_quota` і тест бази (AC-INTAKE-08); час чернетки після відповіді моделі (AC-INTAKE-01); вирізання тегів межі з пробілами й атрибутами; «Draft card» без тексту вимкнена з причиною поруч. Після злиття `db-deploy` зелений, UAT на проді — 10/10 тестів
 
 ### Evals (трек C)
 
@@ -59,6 +60,7 @@
 - UAT на проді (≥ 2 AC): https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/tree/6751aa42b475a377275d5d4cca5a6bda8a3f249c/docs/qa/uat/2026-11-16/ — AC-INTAKE-03 (людина підтверджує) PASS, AC-INTAKE-06 (відмова) PASS, AC-INTAKE-09 PASS, AC-INTAKE-01 NEEDS-HUMAN (поле дати показує локальний формат 14.05.1990; значення 1990-05-14 перевірене тестом)
 - `docs/conformance.md`: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/docs/conformance.md — AC-INTAKE-01…09 «реалізовано»
 - «eval готовий» у чаті команди: 16.11, eval 16.11
+- Приймання PM: самоприймання: PM і розробник одна людина (PM передано 03.11), оцінку має підтвердити викладач. Підпис PM: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/pull/62#issuecomment-6922886558 (16.11.2026): прогін PM golden на проді 10/10 (scheduler1, Playwright, коміт `10cea84`), поріг 8/10 з GC-09 і GC-10 пройдено; AC-INTAKE-01…09 ✅. Таблиця приймання PM: вкладка therapy-scheduling, AC-INTAKE-01…09 — оцінка 3, «прийнято»
 - Відхилення від PM: не надходило
 - Акаунти для нових ролей зрізу 4: нових ролей немає
 
