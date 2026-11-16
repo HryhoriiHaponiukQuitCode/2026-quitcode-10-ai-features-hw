@@ -1,0 +1,67 @@
+# Здача WS10
+
+## Дані
+
+- Роль: dev
+- Команда: therapy-scheduling
+- GitHub-логін: HryhoriiHaponiukQuitCode
+- Ваше репо: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling
+- SHA: 6751aa42b475a377275d5d4cca5a6bda8a3f249c
+- Репо вимог PM: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling-spec
+- Прод-URL: https://therapy-scheduling-two.vercel.app
+
+## PM
+
+—
+
+## Розробник
+
+### D0 — умова прийняття
+
+- `/api/health`: https://therapy-scheduling-two.vercel.app/api/health — `"db":"ok"`, SHA `main`
+- Зелений прогін `smoke` на `main`: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/actions/runs/43905123667
+- `accounts.zip` на SHA: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/accounts.zip
+- Ролі тестових акаунтів: адміністратор — admin1@example.test; планувальник — scheduler1@example.test, scheduler2@example.test; терапевт — therapist1@example.test, therapist2@example.test (зріз 4 нових ролей не додає)
+- Версія `next`: next@16.4.3
+
+### Спека зрізу 4 (трек A)
+
+- AC зрізу 4: AC-INTAKE-01, AC-INTAKE-02, AC-INTAKE-03, AC-INTAKE-04, AC-INTAKE-05, AC-INTAKE-06, AC-INTAKE-07, AC-INTAKE-08, AC-INTAKE-09
+- `/requirements-sync` — PR «Оновлення вимог»: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/pull/58
+- Спека `add-<зріз4>` і план з розділом «AI» — PR «Специфікація»: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/pull/59 (спека `add-client-intake`), https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/pull/60 (план `impl-client-intake`, розділ AI — https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/openspec/changes/archive/2026-11-16-impl-client-intake/design.md)
+- Після уточнень PM: «/requirements-sync 2026-11-16» — знімок уже містить останню зміну вимоги #36 (оновлено 2026-11-13T20:37:50Z, стабільні дати golden cases); AC після неї не змінювались
+- Golden cases PM у `cases.json`: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/tests/fixtures/golden/cases.json — GC-01…10, вхід дослівно з вимоги PM #36 (перенесено скриптом), `expected` — з таблиці PM
+- ADR на залежності: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/docs/decisions/0003-ai-intake-anthropic.md
+- Питання PM: питань не було
+
+### AI-функція (трек B)
+
+- Ланцюжок моделей: **не `:free`** — одна модель Anthropic `claude-haiku-5-5` (ключ розробника), без fallback. Свідоме відхилення від README HW10 («лише `:free`»), записане в ADR 0003. PDF немає
+- Схема й стани: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/src/lib/ai/schema.ts — `ok / needs_info / refused`, невідоме — `null`; правила, перевірені кодом (https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/src/lib/intake.ts): дата справжня й не пізніша за сьогодні (AC-INTAKE-05), тип Child за опікуном або віком < 18, email — trim, малі літери, без «@» — порожньо, email клієнта не стає email опікуна, «Missing: …» у порядку форми
+- Ключ лише на сервері: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/src/lib/ai/anthropic.ts (`import "server-only"`, єдиний файл у `src/`, що читає `ANTHROPIC_API_KEY`); `tests/ai-key.test.ts` зелений у CI https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/actions/runs/43904999373
+- Людина підтверджує перед записом: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/src/app/%28app%29/clients/intake-actions.ts — `getClaims()` і роль до моделі; дія нічого не пише в базу. Запис — лише «Create client» (https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/src/app/%28app%29/clients/actions.ts): `getClaims()`, роль, повторна перевірка полів, insert під сесією користувача (RLS)
+- Збої: немає ключа, 429 (і HTTP 200 з code 429), 529, таймаут 20 с, не за схемою → «The assistant is unavailable right now. Fill in the form manually.» (AC-INTAKE-08), форма лишається ручною; `maxRetries: 0`
+- Промпт з даними в межах: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/src/lib/ai/prompts/intake.ts — теги `<client_request>`, теги з тексту вирізано, ≤ 2000 символів, `INTAKE_PROMPT_VERSION` = `intake-v2`
+- PR задач «Реалізація»: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/pull/61, https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/pull/62 — злиті. CodeRabbit на обидва не зробив рев'ю («Review limit reached»), знахідок немає; злито без рев'ю через строк здачі — сказано в коментарях PR
+
+### Evals (трек C)
+
+- `tests/golden.test.ts`: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/tests/golden.test.ts — `it.each` з назвами «AC-INTAKE-NN: golden %s»
+- Прогін CI з офлайн golden і `ac:coverage`: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/actions/runs/43904999373
+- Записи живого прогону: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/tests/fixtures/golden/recorded.json — `RECORD=1 npm run eval` 16.11.2026, `claude-haiku-5-5`, `intake-v2`, не заглушки
+- Тести збоїв та ін'єкції: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/tests/golden.test.ts (AC-INTAKE-08: не за схемою, 429, 429 у тілі HTTP 200, 529, таймаут), https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/tests/intake.test.ts (AC-INTAKE-07: теги межі), https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/tests/intake-action.test.ts (AC-INTAKE-07, 08, 09)
+- Звіт живого eval: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/evals/reports/2026-11-16T16-13-40-518Z.md — `b55a165`, 10/10, усі відповіді `claude-haiku-5-5`
+- Пояснення FAIL і NOT RUN: FAIL немає, NOT RUN немає. Поза звітом: перший запис (промпт `intake-v1`) теж 10/10; `intake-v2` — лише заміна «—» на кому в промпті (правило lint), записи перезаписано
+
+### Прод, UAT і приймання PM (трек D)
+
+- Зріз 4 на проді: /api/health показав `b55a165` (злиття #61) під час UAT; міграцій немає
+- UAT на проді (≥ 2 AC): https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/tree/6751aa42b475a377275d5d4cca5a6bda8a3f249c/docs/qa/uat/2026-11-16/ — AC-INTAKE-03 (людина підтверджує) PASS, AC-INTAKE-06 (відмова) PASS, AC-INTAKE-09 PASS, AC-INTAKE-01 NEEDS-HUMAN (поле дати показує локальний формат 14.05.1990; значення 1990-05-14 перевірене тестом)
+- `docs/conformance.md`: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/6751aa42b475a377275d5d4cca5a6bda8a3f249c/docs/conformance.md — AC-INTAKE-01…09 «реалізовано»
+- «eval готовий» у чаті команди: 16.11, eval 16.11
+- Відхилення від PM: не надходило
+- Акаунти для нових ролей зрізу 4: нових ролей немає
+
+## Бонус
+
+—
