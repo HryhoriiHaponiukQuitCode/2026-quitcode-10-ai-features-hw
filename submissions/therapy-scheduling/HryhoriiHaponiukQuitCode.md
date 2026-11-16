@@ -29,7 +29,7 @@
 - AC зрізу 4: AC-INTAKE-01, AC-INTAKE-02, AC-INTAKE-03, AC-INTAKE-04, AC-INTAKE-05, AC-INTAKE-06, AC-INTAKE-07, AC-INTAKE-08, AC-INTAKE-09
 - `/requirements-sync` — PR «Оновлення вимог»: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/pull/58
 - Спека `add-<зріз4>` і план з розділом «AI» — PR «Специфікація»: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/pull/59 (спека `add-client-intake`), https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/pull/60 (план `impl-client-intake`, розділ AI — https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/10cea84cc79bec3771f345bca90e7e72a9595cbc/openspec/changes/archive/2026-11-16-impl-client-intake/design.md)
-- Після уточнень PM: «/requirements-sync 2026-11-16» — знімок уже містить останню зміну вимоги #36 (оновлено 2026-11-13T20:37:50Z, стабільні дати golden cases); AC після неї не змінювались
+- Після уточнень PM: «/requirements-sync 2026-11-16: Вимоги актуальні» — знімок уже містить останню зміну вимоги #36 (оновлено 2026-11-13T20:37:50Z, стабільні дати golden cases); AC після неї не змінювались
 - Golden cases PM у `cases.json`: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/10cea84cc79bec3771f345bca90e7e72a9595cbc/tests/fixtures/golden/cases.json — GC-01…10, вхід дослівно з вимоги PM #36 (перенесено скриптом), `expected` — з таблиці PM
 - ADR на залежності: https://github.com/HryhoriiHaponiukQuitCode/therapy-scheduling/blob/10cea84cc79bec3771f345bca90e7e72a9595cbc/docs/decisions/0003-ai-intake-anthropic.md
 - Питання PM: питань не було
